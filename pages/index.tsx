@@ -58,7 +58,7 @@ export default function ClaimPage() {
     setError('')
 
     try {
-      // 1) Send claim to Discord
+      // Send claim to Discord
       const res = await fetch('/api/confirm-claim', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -70,9 +70,6 @@ export default function ClaimPage() {
         }),
       })
       if (!res.ok) throw new Error('Failed to confirm claim.')
-
-      // 2) Auto-accept ALL pending friend requests
-      await fetch('/api/accept-friend-request', { method: 'POST' })
 
       setStep(3)
     } catch (e: any) {
@@ -181,7 +178,7 @@ export default function ClaimPage() {
             <div className="text-center space-y-4">
               <h2 className="text-3xl font-extrabold">Final Step</h2>
               <p className="text-sm text-gray-400 mb-4">
-                If your account is under 13, or you cannot join the private server please add the roblox bot.
+                If your account is under 13, or you cannot join the private server please add the Roblox bot.
               </p>
               <a
                 href="https://www.roblox.com/share?code=fd1849e039cadf4b9a215a93a8caca29&type=Server"
