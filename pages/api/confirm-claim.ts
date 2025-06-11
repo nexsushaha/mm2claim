@@ -1,16 +1,31 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+// pages/api/confirm-claim.ts
+import type { NextApiRequest, NextApiResponse } from 'next'
 
-const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK!;
+type ResponseData = { success: true } | { message: string }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') return res.status(405).end();
+const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK!
 
-  const { orderNumber, username, email, items } = req.body;
-  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST'])
+    return res.status(405).json({ message: `Method ${req.method} Not Allowed` })
+  }
 
-  // Basic safety check for Discord field limits
-  const safeText = (text: string | undefined, fallback = 'N/A') =>
-    text ? String(text).slice(0, 1000) : fallback;
+  const { orderNumber, username, email, items } = req.body as {
+    orderNumber: string
+    username: string
+    email: string
+    items: string
+  }
+
+  if (!orderNumber || !username || !email || !items) {
+    return res
+      .status(400)
+      .json({ message: 'orderNumber, username, email & items are required.' })
+  }
 
   try {
     const embed = {
@@ -19,34 +34,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           title: 'New MM2Land Claim',
           color: 5814783,
           fields: [
-            { name: 'Order #', value: safeText(`#${orderNumber}`), inline: true },
-            { name: 'Roblox Username', value: safeText(username), inline: true },
-            { name: 'Email', value: safeText(email), inline: true },
-            { name: 'Items', value: safeText(items), inline: false },
-            { name: 'IP Address', value: safeText(`${ip}`), inline: false }
+            { name: 'Order #',           value: `#${orderNumber}`, inline: true },
+            { name: 'Roblox Username',   value: username,          inline: true },
+            { name: 'Email',             value: email,             inline: true },
+            { name: 'Items',             value: items,             inline: false },
           ],
           timestamp: new Date().toISOString(),
-        }
-      ]
-    };
+        },
+      ],
+    }
 
     const discordRes = await fetch(DISCORD_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(embed)
-    });
-
-    const result = await discordRes.text();
-    console.log('Discord webhook status:', discordRes.status);
-    console.log('Discord webhook response:', result);
+      body: JSON.stringify(embed),
+    })
 
     if (!discordRes.ok) {
-      return res.status(500).json({ message: 'Discord rejected the webhook' });
+      const text = await discordRes.text()
+      console.error('Discord webhook failed:', discordRes.status, text)
+      return res.status(500).json({ message: 'Discord webhook failed' })
     }
 
-    return res.status(200).json({ success: true });
-  } catch (err) {
-    console.error('Webhook error:', err);
-    return res.status(500).json({ message: 'Webhook failed' });
+    return res.status(200).json({ success: true })
+  } catch (err: any) {
+    console.error('confirm-claim error:', err)
+    return res.status(500).json({ message: 'Internal server error' })
   }
 }
