@@ -16,10 +16,10 @@ export default async function handler(
   }
 
   try {
-    // login with your bot cookie
+    // Log in your bot with the ROBLOX_COOKIE
     await noblox.setCookie(cookie)
 
-    // fetch all incoming friend requests (no arguments)
+    // Fetch all incoming friend requests (no arguments)
     const requests = await noblox.getFriendRequests()
     const toAccept = requests.map(r => r.UserId)
 
