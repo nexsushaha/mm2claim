@@ -1,5 +1,5 @@
 // File: pages/api/accept-friend-request.ts
-import 'dotenv/config'   // ← ensure .env.local is loaded
+import 'dotenv/config'   // ensure .env.local is loaded
 import type { NextApiRequest, NextApiResponse } from 'next'
 import * as noblox from 'noblox.js'
 
@@ -16,9 +16,11 @@ export default async function handler(
   }
 
   try {
+    // login with your bot cookie
     await noblox.setCookie(cookie)
 
-    const requests = await noblox.getFriendRequests({ type: 'Received' })
+    // fetch all incoming friend requests (no arguments)
+    const requests = await noblox.getFriendRequests()
     const toAccept = requests.map(r => r.UserId)
 
     const accepted: number[] = []
