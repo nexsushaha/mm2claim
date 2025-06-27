@@ -1,0 +1,25 @@
+{
+  "name": "claimsite",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.4.15",
+    "dotenv": "^16.5.0",
+    "lru-cache": "^11.1.0",
+    "next": "14.1.4",
+    "noblox.js": "^6.2.0",
+    "postcss": "^8.4.24",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.7",
+    "typescript": "^5.8.3"
+  }
+}
